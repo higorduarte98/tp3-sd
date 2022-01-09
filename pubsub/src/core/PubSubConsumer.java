@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -44,7 +41,25 @@ public class PubSubConsumer<S extends Socket> extends GenericConsumer<S> {
 
             Message response = null;
 
-            if (!isPrimary && !msg.getType().startsWith("sync")) {
+            List<Message> logUser = getMessages();
+            Iterator<Message> it = logUser.iterator();
+
+            System.out.print("Log user itens: ");
+            while (it.hasNext()){
+                Message aux = it.next();
+                System.out.print(aux.getContent() + aux.getLogId() + " | ");
+            }
+
+            System.out.println();
+
+            if(msg.getType().startsWith("changeToPrimary")){
+                System.out.println("ENTROU AQUI");
+                //response = commands.get(msg.getType()).execute(msg, log, subscribers, isPrimary, secondaryServer, secondaryPort);
+                this.isPrimary = true;
+                this.secondaryPort = 0;
+                this.secondaryServer = "";
+            }
+            else if (!isPrimary && !msg.getType().startsWith("sync")) {
 
                 //Client client = new Client(secondaryServer, secondaryPort);
                 //response = client.sendReceive(msg);

@@ -36,7 +36,6 @@ public class Broker {
             System.out.println("Broker stopped...");
             s.stop();
             brokerThread.interrupt();
-
         }
 
         //once finished

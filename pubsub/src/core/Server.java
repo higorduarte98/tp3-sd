@@ -33,9 +33,7 @@ public class Server {
         this.secondaryPort = secondaryPort;
 
         resource = new GenericResource<Socket>();
-
     }
-
 
     public void begin() {
         try {
@@ -56,8 +54,6 @@ public class Server {
     }
 
     protected void listen() {
-
-
         while (!resource.isStopped()) {
 
             try {

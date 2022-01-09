@@ -13,53 +13,53 @@ public class OneAppl {
     }
 
     public OneAppl(boolean flag) {
+        String primaryAdress = "localhost";
+        int primaryPort = 8080;
+        String backupAdress = "localhost";
+        int backupPort = 8081;
 
-        // String hostBroker = "10.128.0.20";
-        // String hostClient = "10.128.0.20";
-        String hostBroker = "localhost";
-        String hostClient = "localhost";
+        PubSubClient clientA = new PubSubClient("localhost", 8082);
+        PubSubClient clientB = new PubSubClient("localhost", 8083);
+        PubSubClient clientC = new PubSubClient("localhost", 8084);
 
-        PubSubClient clientA = new PubSubClient(hostClient, 8081);
-        PubSubClient clientB = new PubSubClient(hostClient, 8082);
-        PubSubClient clientC = new PubSubClient(hostClient, 8083);
+        clientA.subscribe(primaryAdress, primaryPort);
+        clientB.subscribe(primaryAdress, primaryPort);
+        clientC.subscribe(primaryAdress, primaryPort);
 
-        clientA.subscribe(hostBroker, 8080);
-        clientB.subscribe(hostBroker, 8080);
-        clientC.subscribe(hostBroker, 8080);
+        clientA.subscribe(backupAdress, backupPort);
+        clientB.subscribe(backupAdress, backupPort);
+        clientC.subscribe(backupAdress, backupPort);
 
-        Thread accessOne = new requestAcquire(clientA, "ClientA",  "-acquire-", "X", hostBroker, 8080);
-        Thread accessTwo = new requestAcquire(clientB, "ClientB",  "-acquire-", "X", hostBroker, 8080);
-        Thread accessThree = new requestAcquire(clientC, "ClientC",  "-acquire-", "X", hostBroker, 8080);
+        Thread accessOne = new requestAcquire(clientA, "ClientA", "-acquire-", "X", primaryAdress, primaryPort);
+        Thread accessTwo = new requestAcquire(clientB, "ClientB", "-acquire-", "X", primaryAdress, primaryPort);
+        Thread accessThree = new requestAcquire(clientC, "ClientC", "-acquire-", "X", primaryAdress, primaryPort);
 
-        int seconds = (int) (Math.random()*(10000 - 1000)) + 1000;
-        System.out.println("Starting in " + seconds/1000 + " seconds...\n");
+        int seconds = (int) (Math.random() * (10000 - 1000)) + 1000;
+        System.out.println("Starting in " + seconds / 1000 + " seconds...\n");
         try {
             Thread.currentThread().sleep(seconds);
-        }catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
         accessOne.start();
         accessTwo.start();
         accessThree.start();
 
-        try{
+        try {
             accessOne.join();
             accessTwo.join();
             accessThree.join();
-        }catch (Exception ignored){}
-
-        clientA.unsubscribe(hostBroker, 8080);
-        clientB.unsubscribe(hostBroker, 8080);
-        clientC.unsubscribe(hostBroker, 8080);
+        } catch (Exception ignored) {
+        }
+        clientA.unsubscribe(primaryAdress, primaryPort);
+        clientB.unsubscribe(primaryAdress, primaryPort);
+        clientC.unsubscribe(primaryAdress, primaryPort);
 
         clientA.stopPubSubClient();
         clientB.stopPubSubClient();
         clientC.stopPubSubClient();
     }
-
-
 
     class requestAcquire extends Thread {
         PubSubClient client;
@@ -156,7 +156,6 @@ public class OneAppl {
         public int getRandomInteger(int minimum, int maximum){
             return ((int) (Math.random()*(maximum - minimum))) + minimum;
         }
-
     }
 
     class ThreadWrapper extends Thread{

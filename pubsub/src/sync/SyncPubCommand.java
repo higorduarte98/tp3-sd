@@ -17,7 +17,6 @@ public class SyncPubCommand implements PubSubCommand {
 
         response.setLogId(m.getLogId());
 
-
         log.add(m);
 
         response.setContent("Message published on backup: " + m.getContent());

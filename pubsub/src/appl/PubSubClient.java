@@ -17,6 +17,11 @@ public class PubSubClient {
     private String clientAddress;
     private int clientPort;
 
+    private String primaryAddress;
+    private int primaryPort;
+    private String backupAddress;
+    private int backupPort;
+
     public PubSubClient() {
         //this constructor must be called only when the method
         //startConsole is used
@@ -32,7 +37,6 @@ public class PubSubClient {
     }
 
     public void subscribe(String brokerAddress, int brokerPort) {
-
         Message msgBroker = new MessageImpl();
         msgBroker.setBrokerId(brokerPort);
         msgBroker.setType("sub");
@@ -41,47 +45,50 @@ public class PubSubClient {
         Message response = subscriber.sendReceive(msgBroker);
 
         if (response.getType().equals("backup")) {
-            brokerAddress = response.getContent().split(":")[0];
-            brokerPort = Integer.parseInt(response.getContent().split(":")[1]);
-            subscriber = new Client(brokerAddress, brokerPort);
+            this.backupAddress = brokerAddress;
+            this.backupPort = brokerPort;
+            this.primaryAddress = response.getContent().split(":")[0];
+            this.primaryPort = Integer.parseInt(response.getContent().split(":")[1]);
+
+            subscriber = new Client(primaryAddress, primaryPort);
             subscriber.sendReceive(msgBroker);
+        }
+        else {
+            this.primaryAddress = brokerAddress;
+            this.primaryPort = brokerPort;
         }
     }
 
     public void unsubscribe(String brokerAddress, int brokerPort) {
-
         Message msgBroker = new MessageImpl();
         msgBroker.setBrokerId(brokerPort);
         msgBroker.setType("unsub");
         msgBroker.setContent(clientAddress + ":" + clientPort);
-        Client subscriber = new Client(brokerAddress, brokerPort);
-        Message response = subscriber.sendReceive(msgBroker);
-
-        if (response.getType().equals("backup")) {
-            brokerAddress = response.getContent().split(":")[0];
-            brokerPort = Integer.parseInt(response.getContent().split(":")[1]);
-            subscriber = new Client(brokerAddress, brokerPort);
-            subscriber.sendReceive(msgBroker);
-        }
+        Client subscriber = new Client(primaryAddress, primaryPort);
+        subscriber.sendReceive(msgBroker);
+        subscriber = new Client(backupAddress, backupPort);
+        subscriber.sendReceive(msgBroker);
     }
 
     public void publish(String message, String brokerAddress, int brokerPort) {
         Message msgPub = new MessageImpl();
-        msgPub.setBrokerId(brokerPort);
+        msgPub.setBrokerId(primaryPort);
         msgPub.setType("pub");
         msgPub.setContent(message);
 
-        Client publisher = new Client(brokerAddress, brokerPort);
+        Client publisher = new Client(primaryAddress, primaryPort);
         Message response = publisher.sendReceive(msgPub);
 
-        if (response.getType().equals("backup")) {
-            brokerAddress = response.getContent().split(":")[0];
-            brokerPort = Integer.parseInt(response.getContent().split(":")[1]);
-            publisher = new Client(brokerAddress, brokerPort);
+        if(response == null){
+            msgPub.setBrokerId(backupPort);
+            msgPub.setType("changeToPrimary");
+            msgPub.setContent("Change Primary to Backup");
+            primaryAddress = backupAddress;
+            primaryPort = backupPort;
+
+            publisher = new Client(primaryAddress, primaryPort);
             publisher.sendReceive(msgPub);
         }
-
-
     }
 
     public List<Message> getLogMessages() {
