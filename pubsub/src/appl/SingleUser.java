@@ -49,7 +49,20 @@ public class SingleUser {
 
         //Credenciais do Broker----------------------------------
 
+        System.out.print("Enter the Primary Broker port number: ");
+        this.primaryPort = reader.nextInt();
+
+        System.out.print("Enter the Primary Broker address: ");
+        this.primaryAddress = reader.next();
+
+        System.out.print("Enter the Backup Broker port number: ");
+        this.backupPort = reader.nextInt();
+
+        System.out.print("Enter the Backup Broker address: ");
+        this.backupAddress = reader.next();
+
         //Credenciais do usuário---------------------------------
+
         System.out.print("Insira o nome do usuário:");
         String userName = reader.next();
         setUserName(userName);
