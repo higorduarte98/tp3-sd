@@ -43,6 +43,7 @@ public class PubSubClient {
         msgBroker.setType("sub");
         msgBroker.setContent(clientAddress + ":" + clientPort);
         Client subscriber = new Client(brokerAddress, brokerPort);
+        if(subscriber == null) System.out.println("NULL");
         Message response = subscriber.sendReceive(msgBroker);
 
         if (response.getType().equals("backup")) {
