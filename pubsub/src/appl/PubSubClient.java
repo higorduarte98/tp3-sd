@@ -36,6 +36,7 @@ public class PubSubClient {
         clientThread.start();
     }
 
+    /**/
     public void subscribe(String brokerAddress, int brokerPort) {
         Message msgBroker = new MessageImpl();
         msgBroker.setBrokerId(brokerPort);
@@ -70,6 +71,7 @@ public class PubSubClient {
         subscriber.sendReceive(msgBroker);
     }
 
+    /**/
     public void publish(String message, String brokerAddress, int brokerPort) {
         Message msgPub = new MessageImpl();
         msgPub.setBrokerId(primaryPort);

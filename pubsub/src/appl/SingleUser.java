@@ -70,7 +70,7 @@ public class SingleUser {
         System.out.print("Insira o número da porta do usuário:");
         int userPort = reader.nextInt();
 
-        System.out.print("Insira o endereço do usuário:");
+        System.out.print("Insira o endereço do usuário: ");
         String userAddress = reader.next();
 
         PubSubClient user = new PubSubClient(userAddress, userPort);

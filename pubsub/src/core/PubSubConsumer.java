@@ -52,6 +52,7 @@ public class PubSubConsumer<S extends Socket> extends GenericConsumer<S> {
 
             System.out.println();
 
+            /**/
             if(msg.getType().startsWith("changeToPrimary")){
                 System.out.println("ENTROU AQUI");
                 //response = commands.get(msg.getType()).execute(msg, log, subscribers, isPrimary, secondaryServer, secondaryPort);
