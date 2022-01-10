@@ -38,26 +38,30 @@ public class PubSubClient {
 
     /**/
     public void subscribe(String brokerAddress, int brokerPort) {
-        Message msgBroker = new MessageImpl();
-        msgBroker.setBrokerId(brokerPort);
-        msgBroker.setType("sub");
-        msgBroker.setContent(clientAddress + ":" + clientPort);
-        Client subscriber = new Client(brokerAddress, brokerPort);
-        if(subscriber == null) System.out.println("NULL");
-        Message response = subscriber.sendReceive(msgBroker);
+        try {
+            Message msgBroker = new MessageImpl();
+            msgBroker.setBrokerId(brokerPort);
+            msgBroker.setType("sub");
+            msgBroker.setContent(clientAddress + ":" + clientPort);
+            Client subscriber = new Client(brokerAddress, brokerPort);
 
-        if (response.getType().equals("backup")) {
-            this.backupAddress = brokerAddress;
-            this.backupPort = brokerPort;
-            this.primaryAddress = response.getContent().split(":")[0];
-            this.primaryPort = Integer.parseInt(response.getContent().split(":")[1]);
+            Message response = subscriber.sendReceive(msgBroker);
+            System.out.println(response.getType());
 
-            subscriber = new Client(primaryAddress, primaryPort);
-            subscriber.sendReceive(msgBroker);
-        }
-        else {
-            this.primaryAddress = brokerAddress;
-            this.primaryPort = brokerPort;
+            if (response.getType().equals("backup")) {
+                this.backupAddress = brokerAddress;
+                this.backupPort = brokerPort;
+                this.primaryAddress = response.getContent().split(":")[0];
+                this.primaryPort = Integer.parseInt(response.getContent().split(":")[1]);
+
+                subscriber = new Client(primaryAddress, primaryPort);
+                subscriber.sendReceive(msgBroker);
+            } else {
+                this.primaryAddress = brokerAddress;
+                this.primaryPort = brokerPort;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
